@@ -41,7 +41,8 @@ type monitor struct {
 	// map of dynamically starting informers
 	VaryingInformers map[string][]ResourceInformer
 
-	eventCb func(KubeEvent)
+	eventCb       func(KubeEvent)
+	eventsEnabled bool
 	// Index of namespaces statically defined in monitor configuration
 	staticNamespaces map[string]bool
 
@@ -126,9 +127,7 @@ func (m *monitor) CreateInformers() error {
 		m.NamespaceInformer.WithKubeClient(m.KubeClient)
 		err := m.NamespaceInformer.CreateSharedInformer(
 			func(nsName string) {
-				// add function — check, create and run informers for Ns
-				logEntry.Infof("got ns/%s, create dynamic ResourceInformers", nsName)
-
+				// Added/Modified event: check, create and run informers for Ns
 				// ignore event if namespace is already has static ResourceInformers
 				if _, ok := m.staticNamespaces[nsName]; ok {
 					return
@@ -138,6 +137,8 @@ func (m *monitor) CreateInformers() error {
 				if ok {
 					return
 				}
+
+				logEntry.Infof("got ns/%s, create dynamic ResourceInformers", nsName)
 
 				var err error
 				m.VaryingInformers[nsName], err = m.CreateInformersForNamespace(nsName)
@@ -150,11 +151,14 @@ func (m *monitor) CreateInformers() error {
 
 				for _, informer := range m.VaryingInformers[nsName] {
 					informer.WithContext(ctx)
+					if m.eventsEnabled {
+						informer.EnableKubeEventCb()
+					}
 					informer.Start()
 				}
 			},
 			func(nsName string) {
-				// delete function — check, stop and remove informers for Ns
+				// Delete event: check, stop and remove informers for Ns
 				logEntry.Infof("deleted ns/%s, stop dynamic ResourceInformers", nsName)
 
 				// ignore statically specified namespaces
@@ -229,6 +233,8 @@ func (m *monitor) EnableKubeEventCb() {
 			informer.EnableKubeEventCb()
 		}
 	}
+	// Enable events for future VaryingInformers.
+	m.eventsEnabled = true
 }
 
 // CreateInformersForNamespace creates informers bounded to the namespace. If no matchName is specified,
