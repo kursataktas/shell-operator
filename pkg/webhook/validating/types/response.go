@@ -14,6 +14,7 @@ type ValidatingResponse struct {
 	Allowed  bool     `json:"allowed"`
 	Message  string   `json:"message,omitempty"`
 	Warnings []string `json:"warnings,omitempty"`
+	Patch    []byte   `json:"patch,omitempty"`
 }
 
 func ValidatingResponseFromFile(filePath string) (*ValidatingResponse, error) {
