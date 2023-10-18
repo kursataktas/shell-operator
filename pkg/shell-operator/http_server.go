@@ -100,6 +100,8 @@ func newBaseHTTPServer(address, port string) *baseHTTPServer {
 		_, _ = writer.Write(buf.Bytes())
 	})
 
+	fmt.Println("RUNNING base http routes")
+
 	srv := &baseHTTPServer{
 		router:  router,
 		address: address,
