@@ -72,10 +72,13 @@ func (bhs *baseHTTPServer) RegisterRoute(method, pattern string, h http.HandlerF
 }
 
 func newBaseHTTPServer(address, port string) *baseHTTPServer {
+	log.Info("Building base http server")
 	router := chi.NewRouter()
 
 	// inject pprof
 	router.Mount("/debug", middleware.Profiler())
+
+	log.Info("Building base http server routes")
 
 	router.Get("/discovery", func(writer http.ResponseWriter, request *http.Request) {
 		buf := bytes.NewBuffer(nil)
@@ -100,7 +103,7 @@ func newBaseHTTPServer(address, port string) *baseHTTPServer {
 		_, _ = writer.Write(buf.Bytes())
 	})
 
-	fmt.Println("RUNNING base http routes")
+	log.Info("RUNNING base http routes")
 
 	srv := &baseHTTPServer{
 		router:  router,
