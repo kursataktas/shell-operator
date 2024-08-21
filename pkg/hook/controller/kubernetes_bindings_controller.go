@@ -165,6 +165,7 @@ func (c *kubernetesBindingsController) UnlockEventsFor(monitorID string) {
 // StopMonitors stops all monitors for the hook.
 // TODO handle error!
 func (c *kubernetesBindingsController) StopMonitors() {
+	log.Debugf("Stopping all monitors for %v", c)
 	for monitorID := range c.BindingMonitorLinks {
 		_ = c.kubeEventsManager.StopMonitor(monitorID)
 	}

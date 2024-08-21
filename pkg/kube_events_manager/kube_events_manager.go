@@ -112,6 +112,7 @@ func (mgr *kubeEventsManager) StartMonitor(monitorID string) {
 
 // StopMonitor stops monitor and removes it from the index.
 func (mgr *kubeEventsManager) StopMonitor(monitorID string) error {
+	log.Debugf("Stop MONITOR %v", monitorID)
 	mgr.m.RLock()
 	monitor, ok := mgr.Monitors[monitorID]
 	mgr.m.RUnlock()
@@ -133,6 +134,7 @@ func (mgr *kubeEventsManager) Ch() chan KubeEvent {
 // Useful for shutdown without panicking.
 // Calling cancel() leads to a race and panicking, see https://github.com/kubernetes/kubernetes/issues/59822
 func (mgr *kubeEventsManager) PauseHandleEvents() {
+	log.Debug("Pause kube-event-manager")
 	mgr.m.RLock()
 	defer mgr.m.RUnlock()
 	for _, monitor := range mgr.Monitors {
