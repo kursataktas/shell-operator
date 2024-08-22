@@ -75,7 +75,7 @@ func (mgr *kubeEventsManager) AddMonitor(monitorConfig *MonitorConfig) error {
 			log.Debugf("Emitting kube event to channel %v, monitor %v", ev, monitorConfig)
 			mgr.KubeEventCh <- ev
 			for name, monitor := range mgr.Monitors {
-				log.Debugf("Monitor details: %v", mgr.Monitors[monitorConfig.Metadata.MonitorId])
+				log.Debugf("Monitor %v, config %v", name, monitor)
 			}
 		})
 
