@@ -238,14 +238,17 @@ func (ei *resourceInformer) loadExistedObjects() error {
 }
 
 func (ei *resourceInformer) OnAdd(obj interface{}, _ bool) {
+	log.Debugf("handle OnAdd event %v", ei.Monitor.Metadata.MonitorId)
 	ei.handleWatchEvent(obj, WatchEventAdded)
 }
 
 func (ei *resourceInformer) OnUpdate(_, newObj interface{}) {
+	log.Debugf("handle OnUpdate event %v", ei.Monitor.Metadata.MonitorId)
 	ei.handleWatchEvent(newObj, WatchEventModified)
 }
 
 func (ei *resourceInformer) OnDelete(obj interface{}) {
+	log.Debugf("handle OnDelete event %v", ei.Monitor.Metadata.MonitorId)
 	ei.handleWatchEvent(obj, WatchEventDeleted)
 }
 
@@ -379,9 +382,19 @@ func (ei *resourceInformer) handleWatchEvent(object interface{}, eventType Watch
 		ei.eventBufLock.Unlock()
 
 		if eventCbEnabled {
+			log.Debugf("%s: %s %s: send KubeEvent, eventCb enabled",
+				ei.Monitor.Metadata.DebugName,
+				string(eventType),
+				resourceId,
+			)
 			// Pass event info to callback.
 			ei.putEvent(kubeEvent)
 		} else {
+			log.Debugf("%s: %s %s: send KubeEvent, eventCb disabled",
+				ei.Monitor.Metadata.DebugName,
+				string(eventType),
+				resourceId,
+			)
 			ei.eventBufLock.Lock()
 			// Save event in buffer until the callback is enabled.
 			if ei.eventBuf == nil {
@@ -436,6 +449,7 @@ func (ei *resourceInformer) start() {
 
 	go func() {
 		if ei.ctx != nil {
+			log.Debugf("%s: err!=nil resource informer", ei.Monitor.Metadata.DebugName)
 			<-ei.ctx.Done()
 			DefaultFactoryStore.Stop(ei.FactoryIndex)
 		}
