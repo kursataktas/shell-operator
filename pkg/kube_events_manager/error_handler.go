@@ -30,6 +30,7 @@ func newWatchErrorHandler(description string, kind string, logLabels map[string]
 // Handler is the implementation of WatchErrorHandler that is aware of monitors and metricStorage
 func (weh *WatchErrorHandler) handler(_ *cache.Reflector, err error) {
 	errorType := "nil"
+	weh.logEntry.Errorf("Error handler description: %s, kind: %v,  err: %v:", weh.description, weh.kind, err)
 
 	switch {
 	case IsExpiredError(err):
