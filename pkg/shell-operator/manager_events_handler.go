@@ -71,6 +71,7 @@ func (m *ManagerEventsHandler) Start() {
 				}
 
 			case kubeEvent := <-m.kubeEventsManager.Ch():
+				log.Debugf("Received kube event: %v", kubeEvent)
 				if m.kubeEventCb != nil {
 					tailTasks = m.kubeEventCb(kubeEvent)
 				}

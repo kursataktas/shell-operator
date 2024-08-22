@@ -256,6 +256,10 @@ func (ei *resourceInformer) OnDelete(obj interface{}) {
 func (ei *resourceInformer) handleWatchEvent(object interface{}, eventType WatchEventType) {
 	// check if stop
 	if ei.stopped {
+		log.Debugf("%s: %s: can't process KubeEvent - informer stopped",
+			ei.Monitor.Metadata.DebugName,
+			string(eventType),
+		)
 		return
 	}
 
@@ -270,6 +274,12 @@ func (ei *resourceInformer) handleWatchEvent(object interface{}, eventType Watch
 	obj := object.(*unstructured.Unstructured)
 
 	resourceId := resourceId(obj)
+
+	log.Debugf("%s: %s %s: process KubeEvent",
+		ei.Monitor.Metadata.DebugName,
+		string(eventType),
+		resourceId,
+	)
 
 	// Always calculate checksum and update cache, because we need an actual state in ei.cachedObjects.
 

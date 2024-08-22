@@ -72,6 +72,7 @@ func (mgr *kubeEventsManager) AddMonitor(monitorConfig *MonitorConfig) error {
 		monitorConfig,
 		func(ev KubeEvent) {
 			defer trace.StartRegion(context.Background(), "EmitKubeEvent").End()
+			log.Debugf("Emitting kube event to channel %v, monitor %v", ev, monitorConfig)
 			mgr.KubeEventCh <- ev
 		})
 
