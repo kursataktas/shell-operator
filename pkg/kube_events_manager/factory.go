@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	log "github.com/sirupsen/logrus"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -27,7 +28,6 @@ type FactoryIndex struct {
 	Namespace     string
 	FieldSelector string
 	LabelSelector string
-	MonitorId     string
 }
 
 type Factory struct {
@@ -91,6 +91,7 @@ func (c *FactoryStore) Start(ctx context.Context, client dynamic.Interface, inde
 	defer c.mu.Unlock()
 
 	factory := c.get(ctx, client, index)
+	log.Debugf("start factory %v for index %v", factory, index)
 
 	informer := factory.shared.ForResource(index.GVR).Informer()
 	// Add error handler, ignore "already started" error.
@@ -122,6 +123,7 @@ func (c *FactoryStore) Stop(index FactoryIndex) {
 
 	f.score--
 	if f.score == 0 {
+		log.Debugf("stop informerts for %v for index %v", f, index)
 		f.cancel()
 		delete(c.data, index)
 		return
