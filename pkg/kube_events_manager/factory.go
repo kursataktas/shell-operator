@@ -128,6 +128,5 @@ func (c *FactoryStore) Stop(index FactoryIndex) {
 		delete(c.data, index)
 		return
 	}
-
 	c.data[index] = f
 }
