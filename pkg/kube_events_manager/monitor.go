@@ -23,7 +23,7 @@ type Monitor interface {
 	GetConfig() *MonitorConfig
 	SnapshotOperations() (total *CachedObjectsInfo, last *CachedObjectsInfo)
 	GetStaticInformers() []*resourceInformer
-	GetDynamicInformers() []*resourceInformer
+	GetDynamicInformers() map[string][]*resourceInformer
 }
 
 // Monitor holds informers for resources and a namespace informer
@@ -75,7 +75,7 @@ func (m *monitor) GetStaticInformers() []*resourceInformer {
 	return m.ResourceInformers
 }
 
-func (m *monitor) GetDynamicInformers() []*resourceInformer {
+func (m *monitor) GetDynamicInformers() map[string][]*resourceInformer {
 	return m.VaryingInformers
 }
 

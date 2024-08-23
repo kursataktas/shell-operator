@@ -77,10 +77,12 @@ func (mgr *kubeEventsManager) AddMonitor(monitorConfig *MonitorConfig) error {
 			for name, monitor := range mgr.Monitors {
 				log.Debugf("Monitor %v, config %v", name, monitor)
 				for _, informer := range monitor.GetStaticInformers() {
-					log.Debugf("Monitor=%v, static=informer %v, stopped=%v", name, informer, informer.IsStopped())
+					log.Debugf("Monitor=%v, static=informer %v, sharedinformer=%v, stopped=%v", name, informer, informer.informer, informer.informer.IsStopped())
 				}
-				for _, informer := range monitor.GetDynamicInformers() {
-					log.Debugf("Monitor=%v, dynamic=informer %v, stopped=%v", name, informer, informer.IsStopped())
+				for k, v := range monitor.GetDynamicInformers() {
+					for _, informer := range v {
+						log.Debugf("Monitor=%v, string=%s, dynamic=informer %v, sharedinformer=%v, stopped=%v", name, k, informer, informer.informer, informer.informer.IsStopped())
+					}
 				}
 			}
 		})
