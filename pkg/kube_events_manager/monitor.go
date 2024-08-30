@@ -22,8 +22,6 @@ type Monitor interface {
 	EnableKubeEventCb()
 	GetConfig() *MonitorConfig
 	SnapshotOperations() (total *CachedObjectsInfo, last *CachedObjectsInfo)
-	GetStaticInformers() []*resourceInformer
-	GetDynamicInformers() map[string][]*resourceInformer
 }
 
 // Monitor holds informers for resources and a namespace informer
@@ -69,14 +67,6 @@ func NewMonitor(ctx context.Context, client *klient.Client, mstor *metric_storag
 
 func (m *monitor) GetConfig() *MonitorConfig {
 	return m.Config
-}
-
-func (m *monitor) GetStaticInformers() []*resourceInformer {
-	return m.ResourceInformers
-}
-
-func (m *monitor) GetDynamicInformers() map[string][]*resourceInformer {
-	return m.VaryingInformers
 }
 
 // CreateInformers creates all informers and

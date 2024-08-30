@@ -32,8 +32,6 @@ type resourceInformer struct {
 	GroupVersionResource schema.GroupVersionResource
 	ListOptions          metav1.ListOptions
 
-	informer cache.SharedInformer
-
 	// A cache of objects and filterResults. It is a part of the Monitor's snapshot.
 	cachedObjects map[string]*ObjectAndFilterResult
 	cacheLock     sync.RWMutex
@@ -459,13 +457,11 @@ func (ei *resourceInformer) start() {
 
 	// TODO: separate handler and informer
 	errorHandler := newWatchErrorHandler(ei.Monitor.Metadata.DebugName, ei.Monitor.Kind, ei.Monitor.Metadata.LogLabels, ei.metricStorage)
-	informer, err := DefaultFactoryStore.Start(ei.ctx, ei.KubeClient.Dynamic(), ei.FactoryIndex, ei, errorHandler)
+	err := DefaultFactoryStore.Start(ei.ctx, ei.KubeClient.Dynamic(), ei.FactoryIndex, ei, errorHandler)
 	if err != nil {
 		ei.Monitor.LogEntry.Errorf("%s: cache is not synced for informer", ei.Monitor.Metadata.DebugName)
 		return
 	}
-	ei.informer = informer
-
 	log.Debugf("%s: informer is ready", ei.Monitor.Metadata.DebugName)
 }
 

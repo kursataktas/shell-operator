@@ -74,23 +74,6 @@ func (mgr *kubeEventsManager) AddMonitor(monitorConfig *MonitorConfig) error {
 			defer trace.StartRegion(context.Background(), "EmitKubeEvent").End()
 			log.Debugf("Emitting kube event to channel %v, monitor %v", ev, monitorConfig)
 			mgr.KubeEventCh <- ev
-			for name, monitor := range mgr.Monitors {
-				log.Debugf("Monitor %v, config %v", name, monitor)
-				for _, informer := range monitor.GetStaticInformers() {
-					log.Debugf("Monitor=%v, static=informer %v", name, informer)
-					if informer.informer != nil {
-						log.Debugf("Monitor=%v, static=informer %v, sharedinformer=%v, stopped=%v", name, informer, informer.informer, informer.informer.IsStopped())
-					}
-				}
-				for k, v := range monitor.GetDynamicInformers() {
-					for _, informer := range v {
-						log.Debugf("Monitor=%v, string=%s, dynamic=informer %v", name, k, informer)
-						if informer.informer != nil {
-							log.Debugf("Monitor=%v, string=%s, dynamic=informer %v, sharedinformer=%v, stopped=%v", name, k, informer, informer.informer, informer.informer.IsStopped())
-						}
-					}
-				}
-			}
 		})
 
 	err := monitor.CreateInformers()

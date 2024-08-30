@@ -88,7 +88,7 @@ func (c *FactoryStore) get(ctx context.Context, client dynamic.Interface, index 
 	return c.data[index]
 }
 
-func (c *FactoryStore) Start(ctx context.Context, client dynamic.Interface, index FactoryIndex, handler cache.ResourceEventHandler, errorHandler *WatchErrorHandler) (cache.SharedInformer, error) {
+func (c *FactoryStore) Start(ctx context.Context, client dynamic.Interface, index FactoryIndex, handler cache.ResourceEventHandler, errorHandler *WatchErrorHandler) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -107,10 +107,10 @@ func (c *FactoryStore) Start(ctx context.Context, client dynamic.Interface, inde
 		if err := wait.PollUntilContextCancel(ctx, DefaultSyncTime, true, func(_ context.Context) (bool, error) {
 			return informer.HasSynced(), nil
 		}); err != nil {
-			return informer, err
+			return err
 		}
 	}
-	return informer, nil
+	return nil
 }
 
 func (c *FactoryStore) Stop(index FactoryIndex) {
