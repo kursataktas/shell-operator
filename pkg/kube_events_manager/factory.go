@@ -61,8 +61,10 @@ func (c *FactoryStore) add(ctx context.Context, index FactoryIndex, f dynamicinf
 func (c *FactoryStore) get(ctx context.Context, client dynamic.Interface, index FactoryIndex) Factory {
 	f, ok := c.data[index]
 	if ok {
+		log.Debugf("index get %v, current score %d", index, c.data[index].score)
 		f.score++
 		c.data[index] = f
+		log.Debugf("index get %v, new score %d", index, c.data[index].score)
 		return f
 	}
 
@@ -91,7 +93,7 @@ func (c *FactoryStore) Start(ctx context.Context, client dynamic.Interface, inde
 	defer c.mu.Unlock()
 
 	factory := c.get(ctx, client, index)
-	log.Debugf("start factory %v for index %v", factory, index)
+	log.Debugf("start factory %v for index %v, score %d", factory, index, factory.score)
 
 	informer := factory.shared.ForResource(index.GVR).Informer()
 	// Add error handler, ignore "already started" error.
@@ -116,6 +118,7 @@ func (c *FactoryStore) Stop(index FactoryIndex) {
 	defer c.mu.Unlock()
 
 	f, ok := c.data[index]
+	log.Debugf("index Stop %v, current score %d", index, c.data[index].score)
 	if !ok {
 		// already deleted
 		return
@@ -123,10 +126,12 @@ func (c *FactoryStore) Stop(index FactoryIndex) {
 
 	f.score--
 	if f.score == 0 {
+		log.Debugf("index Stop and Delete %v, before score %d, after score %d", index, c.data[index].score, f.score)
 		log.Debugf("stop informerts for %v for index %v", f, index)
 		f.cancel()
 		delete(c.data, index)
 		return
 	}
 	c.data[index] = f
+	log.Debugf("index Stop %v, new score %d", index, c.data[index].score)
 }
