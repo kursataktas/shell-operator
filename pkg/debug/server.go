@@ -1,6 +1,7 @@
 package debug
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -152,6 +153,14 @@ func handleFormattedOutput(writer http.ResponseWriter, request *http.Request, ha
 func transformUsingFormat(w io.Writer, val interface{}, format string) (err error) {
 	switch format {
 	case "yaml":
+		valMap := val.(map[string]interface{})
+		for k, v := range valMap {
+			fmt.Printf("DEBUG, SNAPSHOT %s\n!!!!", k)
+			buf := new(bytes.Buffer)
+			enc := yaml.NewEncoder(buf)
+			enc.SetIndent(2)
+			err = enc.Encode(v)
+		}
 		enc := yaml.NewEncoder(w)
 		enc.SetIndent(2)
 		err = enc.Encode(val)
