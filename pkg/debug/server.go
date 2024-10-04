@@ -155,7 +155,7 @@ func transformUsingFormat(w io.Writer, val interface{}, format string) (err erro
 	case "yaml":
 		valMap := val.(map[string]interface{})
 		for k, v := range valMap {
-			fmt.Printf("DEBUG, SNAPSHOT %s\n!!!!", k)
+			fmt.Printf("DEBUG, SNAPSHOT %s: %v\n!!!!", k, v)
 			buf := new(bytes.Buffer)
 			enc := yaml.NewEncoder(buf)
 			enc.SetIndent(2)
